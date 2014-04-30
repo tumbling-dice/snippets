@@ -10,4 +10,7 @@
 
 * [Android](https://github.com/tumbling-dice/snippets/tree/master/Android "Android")
     * [Reactive](https://github.com/tumbling-dice/snippets/tree/master/Android/Reactive "Reactive") - AsyncTaskとかAsyncTaskLoaderを改造したあれこれ
-
+* [Javascript](https://github.com/tumbling-dice/snippets/tree/master/Javascript "Javascript")
+    * [sakura](https://github.com/tumbling-dice/snippets/tree/master/Javascript/sakura "sakura") - サクラエディタのマクロ
+    * [TumblingDice](https://github.com/tumbling-dice/snippets/tree/master/Javascript/TumblingDice "TumblingDice") - サイト内スクリプト
+* [Ruby](https://github.com/tumbling-dice/snippets/tree/master/Ruby "Ruby") - まだあんまり書いてない
