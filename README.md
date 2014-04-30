@@ -18,3 +18,9 @@
     * [Json](https://github.com/tumbling-dice/snippets/tree/master/Json "VB - Json") - VB6.0でJsonをパースするアレ
 * [C#](https://github.com/tumbling-dice/snippets/tree/master/C%20Sharp "C#")
     * [ManagedCred](https://github.com/tumbling-dice/snippets/tree/master/C%20Sharp/ManagedCred "C# - ManagedCred") - Windows資格情報をアレコレするアレ
+    * [SSIS](https://github.com/tumbling-dice/snippets/tree/master/C%20Sharp/SSIS "C# - SSIS")
+        * [CustomComponent](https://github.com/tumbling-dice/snippets/tree/master/C%20Sharp/SSIS/CustomComponent "C# - SSIS - CustomComponent") - SSISのカスタムコンポーネント系
+            * [CrmConnectionManager](https://github.com/tumbling-dice/snippets/tree/master/C%20Sharp/SSIS/CustomComponent/CrmConnectionManager "C# - SSIS - CustomComponent - CrmConnectionManager") Dynamic CRM用の接続マネージャー
+            * [CrmConnectionManager.Resource](https://github.com/tumbling-dice/snippets/tree/master/C%20Sharp/SSIS/CustomComponent/CrmConnectionManager.Resource "C# - SSIS - CustomComponent - CrmConnectionManager.Resource") Dynamic CRM用の接続マネージャー（UI）
+            * [JapaneseBigger](https://github.com/tumbling-dice/snippets/tree/master/C%20Sharp/SSIS/CustomComponent/JapaneseBigger "C# - SSIS - CustomComponent - JapaneseBigger") 捨て仮名を大文字に変換するデータフローコンポーネント
+            * [RowCounter](https://github.com/tumbling-dice/snippets/tree/master/C%20Sharp/SSIS/CustomComponent/RowCounter "C# - SSIS - CustomComponent - RowCounter") 行番号を追加するデータフローコンポーネント
