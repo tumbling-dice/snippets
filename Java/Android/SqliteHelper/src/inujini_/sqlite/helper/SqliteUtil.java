@@ -8,7 +8,6 @@ import inujini_.sqlite.meta.ISqlite;
 import inujini_.sqlite.meta.annotation.SqliteField;
 import inujini_.sqlite.meta.annotation.SqliteTable;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -185,16 +184,7 @@ public class SqliteUtil {
 			@Override
 			public Boolean call(Field x) {
 				//SqliteFieldのあるフィールドだけをフィルタする
-				Annotation[] annotations = x.getDeclaredAnnotations();
-				if(annotations.length == 0) return false;
-
-				return linq(annotations)
-						.where(new Predicate<Annotation>() {
-							@Override
-							public Boolean call(Annotation x) {
-								return x instanceof SqliteField;
-							}
-						}).any();
+				return x.getAnnotation(SqliteField.class) != null;
 			}
 		})
 		.forEach(new Action1<Field>() {
@@ -202,18 +192,8 @@ public class SqliteUtil {
 			public void call(Field x) {
 
 				//SqliteFieldを取得する
-				SqliteField fieldAttribute = linq(x.getDeclaredAnnotations())
-											.where(new Predicate<Annotation>() {
-												@Override
-												public Boolean call(Annotation x) {
-													return x instanceof SqliteField;
-												}
-											}).select(new Func1<Annotation, SqliteField>() {
-												@Override
-												public SqliteField call(Annotation x) {
-													return (SqliteField) x;
-												}
-											}).first();
+				SqliteField fieldAttribute = x.getAnnotation(SqliteField.class);
+
 				//カラム名
 				String columnName = fieldAttribute.name();
 
