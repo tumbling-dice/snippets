@@ -8,6 +8,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface SqliteTable {
-	String name();
-	boolean hasPrimaryId();
+	String value();
+	boolean hasPrimaryId() default false;
 }

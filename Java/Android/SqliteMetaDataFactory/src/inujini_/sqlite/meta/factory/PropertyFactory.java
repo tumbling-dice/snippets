@@ -46,7 +46,7 @@ public class PropertyFactory extends AbstractProcessor {
 					if(tblAttr == null) continue;
 
 					MetaTable metaTable = new MetaTable();
-					metaTable.setTableName(tblAttr.name());
+					metaTable.setTableName(tblAttr.value());
 					metaTable.setHasPrimaryId(tblAttr.hasPrimaryId());
 					metaTable.setPackageName(getPackageName(target));
 

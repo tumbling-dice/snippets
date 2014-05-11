@@ -155,7 +155,7 @@ public class SqliteUtil {
 	}
 
 	public static String getTableName(Class<? extends ISqlite> clazz) {
-		return clazz.getAnnotation(SqliteTable.class).name();
+		return clazz.getAnnotation(SqliteTable.class).value();
 	}
 
 	public static String getDropTableQuery(Class<? extends ISqlite> clazz) {
@@ -173,7 +173,7 @@ public class SqliteUtil {
 		//テーブル名
 		SqliteTable tblAttribute = clazz.getAnnotation(SqliteTable.class);
 
-		final String tblName = tblAttribute.name();
+		final String tblName = tblAttribute.value();
 		tblBuilder.append(tblName).append(" (");
 
 		//_idのプライマリキー有無

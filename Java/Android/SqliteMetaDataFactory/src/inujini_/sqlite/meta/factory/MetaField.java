@@ -1,5 +1,6 @@
 package inujini_.sqlite.meta.factory;
 
+
 class MetaField {
 	private String columnName;
 	private int type;
