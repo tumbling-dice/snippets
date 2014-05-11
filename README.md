@@ -8,8 +8,12 @@
 
 現在色々なところに散らばったコードを回収してまとめている最中なので気長にお待ちください。
 
-* [Android](https://github.com/tumbling-dice/snippets/tree/master/Android "Android")
-    * [Reactive](https://github.com/tumbling-dice/snippets/tree/master/Android/Reactive "Android - Reactive") - AsyncTaskとかAsyncTaskLoaderを改造したあれこれ
+* [Java](https://github.com/tumbling-dice/snippets/tree/master/Java "Java")
+    * [Android](https://github.com/tumbling-dice/snippets/tree/master/Java/Android "Java - Android")
+        * [Reactive](https://github.com/tumbling-dice/snippets/tree/master/Java/Android/Reactive "Java - Android - Reactive") - AsyncTaskとかAsyncTaskLoaderを改造したあれこれ
+        * [SqliteHelper](https://github.com/tumbling-dice/snippets/tree/master/Java/Android/SqliteHelper "Java - Android - SqliteHelper") - Sqliteの定形処理とかをまとめたあれこれ
+        * [SqliteMetaDataFactory](https://github.com/tumbling-dice/snippets/tree/master/Java/Android/SqliteMetaDataFactory "Java - Android - SqliteMetaDataFactory") - アノテーションからテーブルのメタデータだけを引っこ抜いたクラスを作成するAPT
+    * [Linq](https://github.com/tumbling-dice/snippets/tree/master/Java/Linq "Java - Linq") - Linq to Objectっつーか関数型パラダイムが使える言語の定形リスト処理（かなりStub）
 * [Javascript](https://github.com/tumbling-dice/snippets/tree/master/Javascript "Javascript")
     * [TumblingDice](https://github.com/tumbling-dice/snippets/tree/master/Javascript/TumblingDice "JavaScript - TumblingDice") - サイト内スクリプト
     * [sakura](https://github.com/tumbling-dice/snippets/tree/master/Javascript/sakura "JavaScript - sakura") - サクラエディタのマクロ
