@@ -6,11 +6,22 @@ import android.support.v4.content.Loader;
 public abstract class LoaderObserver<TReturn> implements LoaderCallbacks<ReactiveAsyncResult<TReturn>> {
 
 	private ProgressDialog _prog;
+	private Action1<TReturn> _onFirst;
 
 	// コンストラクタでProgressDialogを受け取った場合は初回時のみ表示させる
 	public LoaderObserver() {}
+	
 	public LoaderObserver(ProgressDialog prog) {
 		_prog = prog;
+	}
+	
+	public LoaderObserver(Action1<TReturn> onFirst) {
+		_onFirst = onFirst;
+	}
+	
+	public LoaderObserver(ProgressDialog prog, Action1<TReturn> onFirst) {
+		_prog = prog;
+		_onFirst = onFirst;
 	}
 
 	@Override
@@ -28,7 +39,14 @@ public abstract class LoaderObserver<TReturn> implements LoaderCallbacks<Reactiv
 		}
 
 		if(!data.hasError()) {
-			onNext(data.getResult());
+			
+			if(_onFirst == null) {
+				onNext(data.getResult());
+			} else {
+				_onFirst.call(data.getResult());
+				_onFirst = null;
+			}
+			
 			if(((ReactiveAsyncLoader<TReturn>) loader).isComplete()) {
 				onComplete();
 			}
