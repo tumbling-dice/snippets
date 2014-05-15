@@ -12,7 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.example.adapter.DynamicFragmentPagerAdapter;
+import com.example.adapter.SubFragmentPagerAdapter;
 import com.example.fragment.FugaFragment;
 import com.example.fragment.HogeFragment;
 import com.example.fragment.PiyoFragment;
@@ -34,13 +34,14 @@ public class MainActivity extends FragmentActivity {
 		strip.setTabIndicatorColor(0xff9acd32);
 
 
-		HashMap<String, Fragment> fragments = new HashMap<String, Fragment>();
+		HashMap<CharSequence, Fragment> fragments = new HashMap<CharSequence, Fragment>();
 		fragments.put("Fuga", new FugaFragment());
 		fragments.put("Hoge", new HogeFragment());
 
-		DynamicFragmentPagerAdapter adapter = new DynamicFragmentPagerAdapter(getSupportFragmentManager(), fragments);
+		/*DynamicFragmentPagerAdapter adapter
+			= new DynamicFragmentPagerAdapter(getSupportFragmentManager(), fragments);*/
+		SubFragmentPagerAdapter adapter = new SubFragmentPagerAdapter(getSupportFragmentManager(), fragments);
 		adapter.add("Piyo", new PiyoFragment());
-
 		pager.setAdapter(adapter);
 	}
 
@@ -54,7 +55,8 @@ public class MainActivity extends FragmentActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 
 		ViewPager pager = (ViewPager) findViewById(R.id.pager);
-		DynamicFragmentPagerAdapter adapter = (DynamicFragmentPagerAdapter) pager.getAdapter();
+		/*DynamicFragmentPagerAdapter adapter = (DynamicFragmentPagerAdapter) pager.getAdapter();*/
+		SubFragmentPagerAdapter adapter = (SubFragmentPagerAdapter) pager.getAdapter();
 		Bundle arg = new Bundle();
 
 		switch (item.getItemId()) {
