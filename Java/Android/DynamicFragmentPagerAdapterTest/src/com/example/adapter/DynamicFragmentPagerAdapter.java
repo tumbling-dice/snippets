@@ -164,6 +164,10 @@ public class DynamicFragmentPagerAdapter extends PagerAdapter {
 		 * 2.非表示になっていたけど再度表示する必要が出てきた
 		 * 3.#getItemPosition(Object)でPOSITION_NONEが返された
 		 * 
+		 * ここで（このクラスのコメント全体で）言う「表示」とは実際に画面で表示されているFragmentだけではなく、
+		 * 例えばgetPageTitleで取得するタブ名だけがちょっと見えているFragmentも「表示されている」と見なす。
+		 * タブレットetcだとどうなるかわからないが、おおよそ「自分自身＋両隣」ぐらいの範囲だと思って良い。
+		 * 
 		 * 注意する必要があるのは、1のケースだとFragmentManagerに未登録である、と言うこと。
 		 * 裏を返せばそれ以外のケースでは（明示的にremoveしていない限り）必ずFragmentManagerに登録されている。
 		 * 
@@ -249,7 +253,7 @@ public class DynamicFragmentPagerAdapter extends PagerAdapter {
 		 * notifyDataSetChangedを呼ばなくても勝手に更新されてしまう。
 		 *
 		 * そもそもPagerAdapterとFragmentManagerの相性が悪いとしか言いようがない。
-		 * ViewPagerのメソッドをほとんどfinalにしたのもその一言で大体片付く。
+		 * このクラスのメソッドをほとんどfinalにしたのもその一言で大体片付く。
 		 * って言うか、destroyItemとfinishUpdateに色々な役割を持たせすぎだと思う…。
 		 */
 		
