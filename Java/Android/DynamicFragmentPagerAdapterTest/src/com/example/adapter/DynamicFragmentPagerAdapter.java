@@ -13,27 +13,28 @@ import android.view.View;
 import android.view.ViewGroup;
 
 public class DynamicFragmentPagerAdapter extends PagerAdapter {
-
-	protected FragmentManager _fm;
-	protected FragmentTransaction _ft;
-	protected Fragment _primaryItem;
-	protected List<FragmentInfo> _fragments = new ArrayList<FragmentInfo>();
+	
+	private Fragment _primaryItem;
+	private List<FragmentInfo> _fragments = new ArrayList<FragmentInfo>();
+	private FragmentManager _fm;
+	private FragmentTransaction _ft;
+	private FragmentTransactionProxy _ftp;
 	private boolean _isNeedAllChange;
 
-	protected final class FragmentInfo {
+	protected class FragmentInfo {
 		private Fragment fragment;
-		private String name;
+		private CharSequence name;
 		private boolean isShown;
 
-		public FragmentInfo(String name, Fragment fragment) {
+		public FragmentInfo(CharSequence name, Fragment fragment) {
 			this.name = name;
 			this.fragment = fragment;
 		}
 
-		public String getName() {
+		public CharSequence getName() {
 			return this.name;
 		}
-		public void setName(String name) {
+		public void setName(CharSequence name) {
 			this.name = name;
 		}
 		public Fragment getFragment() {
@@ -48,17 +49,57 @@ public class DynamicFragmentPagerAdapter extends PagerAdapter {
 		public void setShown(boolean isShown) {
 			this.isShown = isShown;
 		}
-
+	}
+	
+	protected final class FragmentTransactionProxy {
+		private FragmentTransaction _ft;
+		
+		public FragmentTransactionProxy(FragmentTransaction ft) {
+			_ft = ft;
+		}
+		
+		public FragmentTransactionProxy attach(Fragment fragment) {
+			_ft.attach(fragment);
+			return this;
+		}
+		
+		public FragmentTransactionProxy detach(Fragment fragment) {
+			_ft.detach(fragment);
+			return this;
+		}
+		
+		public FragmentTransactionProxy hide(Fragment fragment) {
+			_ft.hide(fragment);
+			return this;
+		}
+		
+		public boolean isEmpty() {
+			return _ft.isEmpty();
+		}
+		
+		public FragmentTransactionProxy remove(Fragment fragment) {
+			_ft.remove(fragment);
+			return this;
+		}
+		
+		public FragmentTransactionProxy show(Fragment fragment) {
+			_ft.show(fragment);
+			return this;
+		}
+		
+		FragmentTransaction getTransaction() {
+			return _ft;
+		}
 	}
 
 	public DynamicFragmentPagerAdapter(FragmentManager fm) {
 		_fm = fm;
 	}
 
-	public DynamicFragmentPagerAdapter(FragmentManager fm, Map<String, Fragment> fragments) {
+	public DynamicFragmentPagerAdapter(FragmentManager fm, Map<CharSequence, Fragment> fragments) {
 		_fm = fm;
 
-		for(Entry<String, Fragment> entry : fragments.entrySet()) {
+		for(Entry<CharSequence, Fragment> entry : fragments.entrySet()) {
 			_fragments.add(new FragmentInfo(entry.getKey(), entry.getValue()));
 		}
 	}
@@ -77,15 +118,17 @@ public class DynamicFragmentPagerAdapter extends PagerAdapter {
 	}
 
 	@Override
-	public Object instantiateItem(ViewGroup container, int position) {
-		if(_ft == null) _ft = _fm.beginTransaction();
-
+	public final Object instantiateItem(ViewGroup container, int position) {
+		
 		FragmentInfo fi = _fragments.get(position);
 		StringBuilder tag = new StringBuilder();
 		tag.append(container.getId()).append(":").append(fi.getName());
 
 		// destroyItemでdetachされていたFragmentの場合はattachする
 		Fragment f = _fm.findFragmentByTag(tag.toString());
+		
+		transaction();
+		
 		if(f != null && fi.getFragment().equals(f)) {
 			_ft.attach(f);
 			return f;
@@ -105,21 +148,24 @@ public class DynamicFragmentPagerAdapter extends PagerAdapter {
 	}
 
 	@Override
-	public void destroyItem(ViewGroup container, int position, Object object) {
-		// 本来はViewPager（container）の中からView（object）を取り除く処理っぽい
+	public final void destroyItem(ViewGroup container, int position, Object object) {
+		// 本来はViewPager（container）の中からView（object）を取り除く処理
 		// PagerAdapter#getItemPositionでPOSITION_NONEが返ってくるとこれが呼ばれる
 		// と言うか、思っている以上にViewPagerの色んなところから呼ばれる
 
 		// 厄介なのは「画面上で表示しきれなくなったobjectもここを通過する」と言う点だろう
 		// その一点のためだけにFragmentPagerAdapterとFragmentStatePagerAdapterの処理が意味不明になっていると言っても過言ではない
 
+		// このクラスではあくまでもFragmentTransaction#detach(Fragment)しか行わない
+		// 本当に削除する必要がある場合は各メソッドでFragmentTransaction#remove(Fragment)を呼び出す必要がある
+		
 		Fragment fragment = (Fragment)object;
-		if(_ft == null) _ft = _fm.beginTransaction();
+		transaction();
 		_ft.detach(fragment);
 	}
 
 	@Override
-	public void setPrimaryItem(ViewGroup container, int position, Object object) {
+	public final void setPrimaryItem(ViewGroup container, int position, Object object) {
 		if(object == null) return;
 
 		Fragment fragment = (Fragment) object;
@@ -138,7 +184,7 @@ public class DynamicFragmentPagerAdapter extends PagerAdapter {
 	}
 
 	@Override
-	public void finishUpdate(ViewGroup container) {
+	public final void finishUpdate(ViewGroup container) {
 		if(_ft != null) {
 			_ft.commitAllowingStateLoss();
 			_ft = null;
@@ -149,7 +195,7 @@ public class DynamicFragmentPagerAdapter extends PagerAdapter {
 	}
 
 	@Override
-	public boolean isViewFromObject(View view, Object object) {
+	public final boolean isViewFromObject(View view, Object object) {
 		return ((Fragment)object).getView() == view;
 	}
 
@@ -189,16 +235,16 @@ public class DynamicFragmentPagerAdapter extends PagerAdapter {
 	}*/
 
 	@Override
-	public int getItemPosition(Object object) {
+	public final int getItemPosition(Object object) {
 		return _isNeedAllChange ? POSITION_NONE : POSITION_UNCHANGED;
 	}
-
+	
 	/**
 	 * Fragmentを追加します
 	 * @param name タブの表示名
 	 * @param fragment 追加するFragment
 	 */
-	public void add(String name, Fragment fragment) {
+	public void add(CharSequence name, Fragment fragment) {
 		if(hasName(name)) throw new IllegalArgumentException("表示名が重複しています。");
 
 		_fragments.add(new FragmentInfo(name, fragment));
@@ -207,7 +253,7 @@ public class DynamicFragmentPagerAdapter extends PagerAdapter {
 	/**
 	 * Fragmentを取得します
 	 * @param position 0から始まる取得する場所
-	 * @return
+	 * @return positionで指定された位置のFragment
 	 */
 	public Fragment get(int position) {
 		return _fragments.get(position).getFragment();
@@ -218,7 +264,8 @@ public class DynamicFragmentPagerAdapter extends PagerAdapter {
 	 * @param position 0から始まる削除する場所
 	 */
 	public void remove(int position) {
-		if(_ft == null) _ft = _fm.beginTransaction();
+		transaction();
+		_ft.remove(_fragments.getFragment());
 		_fragments.remove(position);
 		_isNeedAllChange = true;
 	}
@@ -229,13 +276,13 @@ public class DynamicFragmentPagerAdapter extends PagerAdapter {
 	 * @param name 新しい表示名
 	 * @param fragment 入れ替え後に表示するFragment
 	 */
-	public void replace(int position, String name, Fragment fragment) {
+	public void replace(int position, CharSequence name, Fragment fragment) {
 		if(hasName(name, position)) throw new IllegalArgumentException("表示名が重複しています。");
 
 		FragmentInfo fi = _fragments.get(position);
 
 		if(fi.isShown()) {
-			if(_ft == null) _ft = _fm.beginTransaction();
+			transaction();
 			_ft.remove(fi.getFragment());
 			_isNeedAllChange = true;
 		}
@@ -249,27 +296,94 @@ public class DynamicFragmentPagerAdapter extends PagerAdapter {
 	 * @param name 表示名
 	 * @param fragment 挿入するFragment
 	 */
-	public void insert(int position, String name, Fragment fragment) {
+	public void insert(int position, CharSequence name, Fragment fragment) {
 		if(hasName(name)) throw new IllegalArgumentException("表示名が重複しています。");
 		_fragments.add(position, new FragmentInfo(name, fragment));
 		_isNeedAllChange = true;
 	}
-
-	private boolean hasName(String name) {
+	
+	/**
+	 * Adapterに設定されているFragmentManagerを取得します
+	 * @return FragmentManager
+	 */
+	protected FragmentManager getFragmentManager() {
+		return _fm;
+	}
+	
+	/**
+	 * FragmentTransactionのProxyを取得します
+	 * @return FragmentTransactionProxy
+	 */
+	protected FragmentTransactionProxy getFragmentTransactionProxy() {
+		transaction();
+		return new FragmentTransactionProxy(_ft);
+	}
+	
+	/**
+	 * PagerAdapter#notifyDataSetChanged時にFragmentを再配置するフラグを設定します
+	 * 既存のFragmentの位置が変更される場合は必ずtrueにする必要があります
+	 * また、notifyDataSetChanged後、もしくはnotifyDataSetChanged前にタブを移動するなどの操作が行われた場合、
+	 * このフラグは強制的にfalseになります
+	 * @see PagerAdapter#finishUpdate()
+	 * @see PagerAdapter#notifyDataSetChanged()
+	 */
+	protected void needAllChange() {
+		_isNeedAllChange = true;
+	}
+	
+	/**
+	 * FragmentInfoを取得します
+	 * @param position 0から始まる取得する位置
+	 * @return positionで指定された位置のFragmentInfo
+	 */
+	protected FragmentInfo getFragmentInfo(int positon) {
+		return _fragments.get(position);
+	}
+	
+	/**
+	 * FragmentInfoのリストを取得します
+	 * @return FragmentInfoのリスト
+	 */
+	protected List<FragmentInfo> getFragmentInfoes() {
+		return _fragments;
+	}
+	
+	/**
+	 * 表示名の重複があるかどうかを調査します
+	 * @param name 調査する表示名
+	 * @return 重複する表示名があればtrue
+	 */
+	protected boolean hasName(CharSequence name) {
 		for (FragmentInfo fi : _fragments) {
 			if(fi.getName().equals(name)) return true;
 		}
-
 		return false;
 	}
 
-	private boolean hasName(String name, int position) {
+	/**
+	 * 表示名の重複があるかどうかを調査します
+	 * @param name 調査する表示名
+	 * @param position 調査を除外する位置
+	 * @return 指定されたpositonと違う位置に重複する表示名がある場合はtrue
+	 */
+	protected boolean hasName(CharSequence name, int position) {
 		for (int i = 0, size = _fragments.size(); i < size; i++) {
-			if(_fragments.get(i).getName().equals(name) && i != position)
-				return true;
+			if(_fragments.get(i).getName().equals(name)){
+				return i != position ? true : false;
+			}
 		}
-
 		return false;
+	}
+	
+	private void transaction() {
+		
+		if(_ftp != null) {
+			_ft = _ftp.getTransaction();
+			_ftp = null;
+			return;
+		}
+		
+		if(_ft == null) _ft = _fm.beginTransaction();
 	}
 
 }
