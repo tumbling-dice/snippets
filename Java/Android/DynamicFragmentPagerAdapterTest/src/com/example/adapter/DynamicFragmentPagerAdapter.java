@@ -26,7 +26,7 @@ public class DynamicFragmentPagerAdapter extends PagerAdapter {
 	/**
 	 * Fragmentの情報を所持するクラス
 	 */
-	protected class FragmentInfo {
+	protected static class FragmentInfo {
 		private Fragment fragment;
 		private CharSequence name;
 		private boolean isShown;
