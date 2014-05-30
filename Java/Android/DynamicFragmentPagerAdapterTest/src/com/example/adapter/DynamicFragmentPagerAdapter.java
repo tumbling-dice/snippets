@@ -38,7 +38,7 @@ public class DynamicFragmentPagerAdapter extends PagerAdapter {
 		 */
 		public FragmentInfo(CharSequence name, Fragment fragment) {
 			this.name = name;
-			this.fragment = new WeakReference<Fragment>(fragment);
+			this.fragment = fragment;
 		}
 
 		public CharSequence getName() {
