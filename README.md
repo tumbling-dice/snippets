@@ -15,6 +15,7 @@
         * [SqliteMetaDataFactory](https://github.com/tumbling-dice/snippets/tree/master/Java/Android/SqliteMetaDataFactory "Java - Android - SqliteMetaDataFactory") - アノテーションからテーブルのメタデータだけを引っこ抜いたクラスを作成するAPT
         * [DynamicFragmentPagerAdapterTest](https://github.com/tumbling-dice/snippets/tree/master/Java/Android/DynamicFragmentPagerAdapterTest "Java - Android - DynamicFragmentPagerAdapterTest") - FragmentPagerAdapterの改造版
         * [ServiceTest](https://github.com/tumbling-dice/snippets/tree/master/Java/Android/ServiceTest "Java - Android - ServiceTest") - Serviceのプロセス間通信のいろいろ
+        * [AndroidWithScala](https://github.com/tumbling-dice/snippets/tree/master/Java/Android/AndroidWithScala "Java - Android - AndroidWithScala) - ScalaでAndroidのサンプル
     * [Linq](https://github.com/tumbling-dice/snippets/tree/master/Java/Linq "Java - Linq") - Linq to Objectっつーか関数型パラダイムが使える言語の定形リスト処理（かなりStub）
 * [Javascript](https://github.com/tumbling-dice/snippets/tree/master/Javascript "Javascript")
     * [TumblingDice](https://github.com/tumbling-dice/snippets/tree/master/Javascript/TumblingDice "JavaScript - TumblingDice") - サイト内スクリプト
