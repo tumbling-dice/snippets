@@ -12,67 +12,77 @@ import android.os.Build;
 public class ReactiveAsyncTask<TSource, TProgress, TReturn> extends AsyncTask<TSource, TProgress, ReactiveAsyncResult<TReturn>> {
 
 	/** 実行前イベント */
-	private V1<Void> _onPreExecute;
+	private Action _onPreExecute;
 	/** バックグラウンド処理 */
-	private R1<TReturn, TSource> _onBackground;
+	private Funct1<TSource, TReturn> _onBackground;
 	/** _onProgressに渡す引数を作成するFunction */
-	private R1<TProgress, Void> _progressArg;
+	private Func<TProgress> _progressArg;
 	/** 途中経過 */
-	private V1<TProgress> _onProgress;
+	private Action1<TProgress> _onProgress;
 	/** 実行後イベント */
-	private V1<TReturn> _onPostExecute;
+	private Action1<TReturn> _onPostExecute;
 	/** _onBackgroundでエラーが発生した時の処理 */
-	private V1<Exception> _onError;
-
-	private boolean isCanceled;
+	private Action1<Exception> _onError;
+	/** キャンセル時処理 */
+	private Action _onCanceled;
 
 	/**
 	 * コンストラクタ
 	 * @param onBackground バックグラウンドで実行する処理
 	 */
-	public ReactiveAsyncTask(R1<TReturn, TSource> onBackground) {
+	public ReactiveAsyncTask(Func1TSource, TReturn> onBackground) {
 		_onBackground = onBackground;
 	}
 
 	/**
 	 * 実行前イベント
-	 * @param action
+	 * @param onPreExecute
 	 * @return
 	 */
-	public ReactiveAsyncTask<TSource, TProgress, TReturn> setOnPreExecute(V1<Void> action) {
-		_onPreExecute = action;
+	public ReactiveAsyncTask<TSource, TProgress, TReturn> setOnPreExecute(Action onPreExecute) {
+		_onPreExecute = onPreExecute;
 		return this;
 	}
 
 	/**
 	 * 途中経過
 	 * @param progressArg 途中経過として渡したい引数を作成するFunction
-	 * @param action
+	 * @param onProgress
 	 * @return
 	 */
-	public ReactiveAsyncTask<TSource, TProgress, TReturn> setOnProgress(R1<TProgress, Void> progressArg, V1<TProgress> action) {
+	public ReactiveAsyncTask<TSource, TProgress, TReturn> setOnProgress(Func1<TProgress> progressArg, Action1<TProgress> onProgress) {
 		_progressArg = progressArg;
-		_onProgress = action;
+		_onProgress = onProgress;
 		return this;
 	}
 
 	/**
 	 * 実行後イベント
-	 * @param action
+	 * @param onPostExecute
 	 * @return
 	 */
-	public ReactiveAsyncTask<TSource, TProgress, TReturn> setOnPostExecute(V1<TReturn> action) {
-		_onPostExecute = action;
+	public ReactiveAsyncTask<TSource, TProgress, TReturn> setOnPostExecute(Action1<TReturn> onPostExecute) {
+		_onPostExecute = onPostExecute;
 		return this;
 	}
 
 	/**
 	 * エラー時イベント
-	 * @param action
+	 * @param onError
 	 * @return
 	 */
-	public ReactiveAsyncTask<TSource, TProgress, TReturn> setOnError(V1<Exception> action) {
-		_onError = action;
+	public ReactiveAsyncTask<TSource, TProgress, TReturn> setOnError(Action1<Exception> onError) {
+		_onError = onError;
+		return this;
+	}
+	
+	/**
+	 * キャンセル時イベント
+	 * @param onCanceled
+	 * @return
+	 */
+	public ReactiveAsyncTask<TSource, TProgress, TReturn> setOnCanceled(Action onCanceled) {
+		_onCanceled = onCanceled;
 		return this;
 	}
 
@@ -84,12 +94,11 @@ public class ReactiveAsyncTask<TSource, TProgress, TReturn> extends AsyncTask<TS
 	@SuppressWarnings("unchecked")
 	@Override
 	protected ReactiveAsyncResult<TReturn> doInBackground(TSource... arg0) {
-
 		ReactiveAsyncResult<TReturn> r = new ReactiveAsyncResult<TReturn>();
-
+		
 		try {
 			r.setResult(_onBackground.call(arg0[0]));
-			if(_progressArg != null) publishProgress(_progressArg.call(null));
+			if(_progressArg != null) publishProgress(_progressArg.call());
 		} catch(RuntimeException e) {
 			r.setError(e);
 		}
@@ -112,7 +121,12 @@ public class ReactiveAsyncTask<TSource, TProgress, TReturn> extends AsyncTask<TS
 			}
 		}
 	}
-
+	
+	@Override
+	protected void onCanceled() {
+		if(_onCanceled != null) _onCanceled.call();
+	}
+	
 	@SuppressLint("NewApi")
 	@SuppressWarnings("unchecked")
 	public void execute(TSource p) {
@@ -123,17 +137,5 @@ public class ReactiveAsyncTask<TSource, TProgress, TReturn> extends AsyncTask<TS
 		}
 	}
 
-	public boolean isCanceled() {
-		return isCanceled;
-	}
-
-	public void setCanceled(boolean isCanceled) {
-		this.isCanceled = isCanceled;
-	}
-
-	@Override
-	protected void onCancelled() {
-		this.isCanceled = true;
-		super.onCancelled();
-	}
+	
 }
