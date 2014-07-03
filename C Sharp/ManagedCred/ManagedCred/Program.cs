@@ -30,7 +30,7 @@ namespace ManagedCred
             Credential.CallCredentialDialog("caption", "message");
 
             // read
-            var c = Credential.Read(credentials[0].TargetName, credentials[0].Type, credentials[0].Flags);
+            var c = Credential.Read(credentials[0].TargetName, credentials[0].Type);
 
             Console.WriteLine("Flags:{0}", c.Flags.ToString());
             Console.WriteLine("Type:{0}", c.Type);

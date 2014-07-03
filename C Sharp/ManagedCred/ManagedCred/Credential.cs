@@ -84,13 +84,12 @@ namespace ManagedCred
         /// </summary>
         /// <param name="targetName"></param>
         /// <param name="type"></param>
-        /// <param name="flags"></param>
         /// <returns></returns>
-        public static ManagedCredential Read(string targetName, CRED_TYPE type, CRED_FLAGS flags)
+        public static ManagedCredential Read(string targetName, CRED_TYPE type)
         {
             var credential = IntPtr.Zero;
 
-            if (!CredRead(targetName, type, flags, out credential))
+            if (!CredRead(targetName, type, 0, out credential))
             {
                 Console.WriteLine(GetErrorMessage());
                 throw new ApplicationException("資格情報の取得に失敗しました。");

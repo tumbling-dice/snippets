@@ -113,7 +113,7 @@ namespace ManagedCred
             }
         }
 
-        public void setPassword(string password)
+        public void SetPassword(string password)
         {
             if (!string.IsNullOrEmpty(password))
             {
