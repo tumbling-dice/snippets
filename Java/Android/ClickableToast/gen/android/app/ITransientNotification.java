@@ -1,6 +1,5 @@
 /*
  * This file is auto-generated.  DO NOT MODIFY.
- * Original file: C:\\Users\\jimbo\\Desktop\\workspace\\ClickableToast\\src\\android\\app\\ITransientNotification.aidl
  */
 package android.app;
 public interface ITransientNotification extends android.os.IInterface

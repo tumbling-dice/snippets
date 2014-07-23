@@ -1,6 +1,5 @@
 /*
  * This file is auto-generated.  DO NOT MODIFY.
- * Original file: C:\\Users\\jimbo\\Desktop\\workspace\\ClickableToast\\src\\android\\app\\INotificationManager.aidl
  */
 package android.app;
 public interface INotificationManager extends android.os.IInterface
