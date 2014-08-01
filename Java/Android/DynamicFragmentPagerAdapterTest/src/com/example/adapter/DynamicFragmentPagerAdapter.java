@@ -27,7 +27,7 @@ public class DynamicFragmentPagerAdapter extends PagerAdapter {
 	 * Fragmentの情報を所持するクラス
 	 */
 	protected static class FragmentInfo {
-		private Fragment fragment;
+		private WeakReference<Fragment> fragment;
 		private CharSequence name;
 		private boolean isShown;
 
@@ -38,7 +38,7 @@ public class DynamicFragmentPagerAdapter extends PagerAdapter {
 		 */
 		public FragmentInfo(CharSequence name, Fragment fragment) {
 			this.name = name;
-			this.fragment = fragment;
+			this.fragment = new WeakReference<Fragment>(fragment);
 		}
 
 		public CharSequence getName() {
@@ -48,10 +48,11 @@ public class DynamicFragmentPagerAdapter extends PagerAdapter {
 			this.name = name;
 		}
 		public Fragment getFragment() {
-			return this.fragment;
+			return this.fragment.get();
 		}
 		public void setFragment(Fragment fragment) {
-			this.fragment = fragment;
+			if(this.fragment != null) this.fragment.clear();
+			this.fragment = new WeakReference<Fragment>(fragment);
 		}
 		public boolean isShown() {
 			return isShown;

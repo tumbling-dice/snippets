@@ -12,26 +12,26 @@ import android.os.Build;
 public class ReactiveAsyncTask<TSource, TProgress, TReturn> extends AsyncTask<TSource, TProgress, ReactiveAsyncResult<TReturn>> {
 
 	/** 実行前イベント */
-	private Action _onPreExecute;
+	private WeakReference<Action> _onPreExecute;
 	/** バックグラウンド処理 */
-	private Funct1<TSource, TReturn> _onBackground;
+	private WeakReference<Func1<TSource, TReturn>> _onBackground;
 	/** _onProgressに渡す引数を作成するFunction */
-	private Func<TProgress> _progressArg;
+	private WeakReference<Func<TProgress>> _progressArg;
 	/** 途中経過 */
-	private Action1<TProgress> _onProgress;
+	private WeakReference<Action1<TProgress>> _onProgress;
 	/** 実行後イベント */
-	private Action1<TReturn> _onPostExecute;
+	private WeakReference<Action1<TReturn>> _onPostExecute;
 	/** _onBackgroundでエラーが発生した時の処理 */
-	private Action1<Exception> _onError;
+	private WeakReference<Action1<Exception>> _onError;
 	/** キャンセル時処理 */
-	private Action _onCanceled;
+	private WeakReference<Action> _onCanceled;
 
 	/**
 	 * コンストラクタ
 	 * @param onBackground バックグラウンドで実行する処理
 	 */
-	public ReactiveAsyncTask(Func1TSource, TReturn> onBackground) {
-		_onBackground = onBackground;
+	public ReactiveAsyncTask(Func1<TSource, TReturn> onBackground) {
+		_onBackground = Util.toWeak(onBackground);
 	}
 
 	/**
@@ -40,7 +40,7 @@ public class ReactiveAsyncTask<TSource, TProgress, TReturn> extends AsyncTask<TS
 	 * @return
 	 */
 	public ReactiveAsyncTask<TSource, TProgress, TReturn> setOnPreExecute(Action onPreExecute) {
-		_onPreExecute = onPreExecute;
+		_onPreExecute = Util.toWeak(onPreExecute);
 		return this;
 	}
 
@@ -51,8 +51,8 @@ public class ReactiveAsyncTask<TSource, TProgress, TReturn> extends AsyncTask<TS
 	 * @return
 	 */
 	public ReactiveAsyncTask<TSource, TProgress, TReturn> setOnProgress(Func1<TProgress> progressArg, Action1<TProgress> onProgress) {
-		_progressArg = progressArg;
-		_onProgress = onProgress;
+		_progressArg = Util.toWeak(progressArg);
+		_onProgress = Util.toWeak(onProgress);
 		return this;
 	}
 
@@ -62,7 +62,7 @@ public class ReactiveAsyncTask<TSource, TProgress, TReturn> extends AsyncTask<TS
 	 * @return
 	 */
 	public ReactiveAsyncTask<TSource, TProgress, TReturn> setOnPostExecute(Action1<TReturn> onPostExecute) {
-		_onPostExecute = onPostExecute;
+		_onPostExecute = Util.toWeak(onPostExecute);
 		return this;
 	}
 
@@ -72,7 +72,7 @@ public class ReactiveAsyncTask<TSource, TProgress, TReturn> extends AsyncTask<TS
 	 * @return
 	 */
 	public ReactiveAsyncTask<TSource, TProgress, TReturn> setOnError(Action1<Exception> onError) {
-		_onError = onError;
+		_onError = Util.toWeak(onError);
 		return this;
 	}
 	
@@ -82,13 +82,13 @@ public class ReactiveAsyncTask<TSource, TProgress, TReturn> extends AsyncTask<TS
 	 * @return
 	 */
 	public ReactiveAsyncTask<TSource, TProgress, TReturn> setOnCanceled(Action onCanceled) {
-		_onCanceled = onCanceled;
+		_onCanceled = Util.toWeak(onCanceled);
 		return this;
 	}
 
 	@Override
 	protected void onPreExecute() {
-		if(_onPreExecute != null) _onPreExecute.call(null);
+		if(_onPreExecute != null) _onPreExecute.get().call(null);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -97,8 +97,8 @@ public class ReactiveAsyncTask<TSource, TProgress, TReturn> extends AsyncTask<TS
 		ReactiveAsyncResult<TReturn> r = new ReactiveAsyncResult<TReturn>();
 		
 		try {
-			r.setResult(_onBackground.call(arg0[0]));
-			if(_progressArg != null) publishProgress(_progressArg.call());
+			r.setResult(_onBackground.get().call(arg0[0]));
+			if(_progressArg != null) publishProgress(_progressArg.get().call());
 		} catch(RuntimeException e) {
 			r.setError(e);
 		}
@@ -108,29 +108,29 @@ public class ReactiveAsyncTask<TSource, TProgress, TReturn> extends AsyncTask<TS
 
 	@Override
 	protected void onProgressUpdate(TProgress... progress) {
-		_onProgress.call(progress[0]);
+		_onProgress.get().call(progress[0]);
 	}
 
 	@Override
 	protected void onPostExecute(ReactiveAsyncResult<TReturn> r) {
 		if(!r.hasError() && _onPostExecute != null) {
-			_onPostExecute.call(r.getResult());
+			_onPostExecute.get().call(r.getResult());
 		} else {
 			if(_onError != null) {
-				_onError.call(r.getError());
+				_onError.get().call(r.getError());
 			}
 		}
 	}
 	
 	@Override
 	protected void onCanceled() {
-		if(_onCanceled != null) _onCanceled.call();
+		if(_onCanceled != null) _onCanceled.get().call();
 	}
 	
 	@SuppressLint("NewApi")
 	@SuppressWarnings("unchecked")
 	public void execute(TSource p) {
-		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.HONEYCOMB_MR1) {
+		if (Build.VERSION.SDK_INT <= 12) {
 		    super.execute(p);
 		} else {
 			super.executeOnExecutor(THREAD_POOL_EXECUTOR, p);

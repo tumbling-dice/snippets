@@ -5,28 +5,28 @@ import android.support.v4.content.Loader;
 
 public abstract class LoaderObserver<TReturn> implements LoaderCallbacks<ReactiveAsyncResult<TReturn>> {
 
-	private ProgressDialog _prog;
-	private Action1<TReturn> _onFirst;
+	private WeakReference<ProgressDialog> _prog;
+	private WeakReference<Action1<TReturn>> _onFirst;
 
 	// コンストラクタでProgressDialogを受け取った場合は初回時のみ表示させる
 	public LoaderObserver() {}
 	
 	public LoaderObserver(ProgressDialog prog) {
-		_prog = prog;
+		_prog = Util.toWeak(prog);
 	}
 	
 	public LoaderObserver(Action1<TReturn> onFirst) {
-		_onFirst = onFirst;
+		_onFirst = Util.toWeak(onFirst);
 	}
 	
 	public LoaderObserver(ProgressDialog prog, Action1<TReturn> onFirst) {
-		_prog = prog;
-		_onFirst = onFirst;
+		_prog = Util.toWeak(prog);
+		_onFirst = Util.toWeak(onFirst);
 	}
 
 	@Override
 	public Loader<ReactiveAsyncResult<TReturn>> onCreateLoader(int id, Bundle args) {
-		if(_prog != null) _prog.show();
+		if(_prog != null) _prog.get().show();
 		return onCreate(id, args);
 	}
 
@@ -34,8 +34,11 @@ public abstract class LoaderObserver<TReturn> implements LoaderCallbacks<Reactiv
 	@Override
 	public void onLoadFinished(Loader<ReactiveAsyncResult<TReturn>> loader, ReactiveAsyncResult<TReturn> data) {
 		if(_prog != null) {
-			_prog.dismiss();
-			_prog = null;
+			ProgressDialog prog = _prog.get();
+			if(prog != null && prog.isShowing()) {
+				prog.dismiss();
+				prog = null;
+			}
 		}
 
 		if(!data.hasError()) {
@@ -43,7 +46,8 @@ public abstract class LoaderObserver<TReturn> implements LoaderCallbacks<Reactiv
 			if(_onFirst == null) {
 				onNext(data.getResult());
 			} else {
-				_onFirst.call(data.getResult());
+				_onFirst.get().call(data.getResult());
+				_onFirst.clear();
 				_onFirst = null;
 			}
 			
