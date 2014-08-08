@@ -73,6 +73,18 @@ public final class Linq<T> implements Iterable<T> {
 
 		return new Linq<U>(tmp);
 	}
+	
+	public <U> Linq<U> selectMany(Func1<T, U[]> f) {
+		ArrayList<U> tmp = new ArrayList<U>();
+
+		for(T obj : _items) {
+			for(U converted : f.call(obj)) {
+				tmp.add(converted);
+			}
+		}
+
+		return new Linq<U>(tmp);
+	}
 
 	public Linq<T> skip(int count) {
 
