@@ -192,8 +192,8 @@ namespace ManagedCred
                 CredentialBlob = new byte[unmanagedCred.CredentialBlobSize],
                 Persist = (CRED_PERSIST)unmanagedCred.Persist,
                 Attributes = Enumerable.Range(0, (int)unmanagedCred.AttributeCount)
-                                                .Select(x => Marshal.ReadIntPtr(unmanagedCred.Attributes, x * Marshal.SizeOf(typeof(CREDENTIAL_ATTRIBUTE))))
-                                                .Select(x => (CREDENTIAL_ATTRIBUTE)Marshal.PtrToStructure(x, typeof(CREDENTIAL_ATTRIBUTE)))
+                                                .Select(i => new IntPtr(unmanagedCred.Attributes.ToInt64() + i * Marshal.SizeOf(typeof(CREDENTIAL_ATTRIBUTE))))
+                                                .Select(attr => (CREDENTIAL_ATTRIBUTE)Marshal.PtrToStructure(attr, typeof(CREDENTIAL_ATTRIBUTE)))
                                                 .ToArray(),
                 TargetAlias = unmanagedCred.TargetAlias,
                 UserName = unmanagedCred.UserName,
